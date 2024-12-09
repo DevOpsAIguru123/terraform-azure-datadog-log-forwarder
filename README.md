@@ -1,14 +1,14 @@
-# Terraform Azure Datadog Log Forwarder
+# Terraform Azure Datadog Log Forwarder :scroll:
 
 Terraform code sample to setup Azure resources required to collect and forward Azure resource logs to Datadog instance.
 
-## Reference Architecture
+## Reference Architecture :bulb:
 
 Most Datadog sites (excluding US3) require a dedicated [Azure integration setup](https://docs.datadoghq.com/logs/guide/azure-logging-guide/?tab=automatedinstallation) to collect and forward Azure resource logs to Datadog. Below is an illustration of the architecture:
 
 ![](./docs/logforwarding.jpg)
 
-### Key Components
+### Key Components :pushpin:
 
 The configuration involves the following steps:
 
@@ -24,20 +24,20 @@ Deploy a Datadog Azure Function with an Event Hub trigger. This function ensures
 
 Configure Azure Resources and/or Azure Monitor to send both resource and activity logs to the Event Hub topic via Diagnostic Settings.
 
-### Terraform Implementation
+### Terraform Implementation :computer:
 
 This repository provides Terraform code to automate the creation and configuration of these resources, complete with VNet integration for enhanced security and network performance.
 
-## Getting Started
+## Getting Started :rocket:
 
-### Prerequisites
+### Prerequisites :page_with_curl:
 
 - Hashicorp Terraform - [Download](https://developer.hashicorp.com/terraform/install)
 - Azure CLI - [Download](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli-windows)
 - Ensure you have access to an active Azure subscription. If you don’t have one, you can sign up for a [free Azure account](https://azure.microsoft.com/en-gb/pricing/purchase-options/azure-account/search?icid=free-search)
 - Retrieve your Datadog API key from the Datadog dashboard under API Keys.
 
-### Setup
+### Setup :hammer_and_wrench:
 
 Follow these steps to set up and deploy the repository:
 
