@@ -4,7 +4,7 @@ Terraform code sample to setup Azure resources required to collect and forward A
 
 ## Reference Architecture :bulb:
 
-Most Datadog sites (excluding US3) require a dedicated [Azure integration setup](https://docs.datadoghq.com/logs/guide/azure-logging-guide/?tab=automatedinstallation) to collect and forward Azure resource logs to Datadog. Below is an illustration of the architecture:
+Most Datadog sites (excluding US3) require a dedicated [Azure integration setup](https://docs.datadoghq.com/logs/guide/azure-logging-guide/?tab=automatedinstallation) to collect and forward Azure resource logs to Datadog. Below is an illustration of this setup:
 
 ![](./docs/logforwarding.jpg)
 
@@ -26,7 +26,9 @@ Configure Azure Resources and/or Azure Monitor to send both resource and activit
 
 ### Terraform Implementation :computer:
 
-This repository provides Terraform code to automate the creation and configuration of these resources, complete with VNet integration for enhanced security and network performance.
+This repository provides Terraform code to automate the creation and configuration of these resources, complete with virtual network integration for enhanced security.
+
+> Note: Alternatively, to configure these resources manually or to automate the setup using Powershell scripts, follow the official Datadog documentation [here](https://docs.datadoghq.com/logs/guide/azure-logging-guide/?tab=automatedinstallation).
 
 ## Getting Started :rocket:
 
@@ -39,7 +41,7 @@ This repository provides Terraform code to automate the creation and configurati
 
 ### Setup :hammer_and_wrench:
 
-Follow these steps to set up and deploy the repository:
+Follow these steps to set up and deploy the infrastructure:
 
 #### 1. Clone the repository
 
