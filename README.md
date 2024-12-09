@@ -1,12 +1,29 @@
 # Terraform Azure Datadog Log Forwarder
 
-Terraform code to setup Azure resources (Azure functions, Eventhub, etc) to collect and forward logs to Datadog.
+Terraform code sample to setup Azure resources required to collect and forward Azure resource logs to Datadog instance.
 
-- The reference architecture to send Azure resource logs to Datadog is given [here](https://docs.datadoghq.com/integrations/guide/azure-architecture-and-configuration/#standard-azure-integration-log-collection).
-- Steps to setup this architecture both manually and with Powershell automation scripts is given [here](https://docs.datadoghq.com/logs/guide/azure-logging-guide/?tab=automatedinstallation).
+## Reference Architecture
 
-This repository aims to provide Terraform code to deploy this log forwarder setup. A resource group will be created with the following setup:
-1. Azure Event Hub Namespace and Topic to collect resource logs
-2. Azure Function app and a log forwarder function with event hub trigger to forward logs to Datadog
-3. Vnet integration for all the resources
-4. Example resource with Diagnostic setting enabled to send logs to Event Hub topic
+All Datadog Sites (except US3) require an explicit [Azure Integration Setup](https://docs.datadoghq.com/logs/guide/azure-logging-guide/?tab=automatedinstallation) to collect and forward Azure resource logs to Datadog, as shown below.
+
+![](./docs/logforwarding.jpg)
+
+The configuration involves the following steps:
+
+1. Create an Azure Event Hub namespace and an Event Hub Topic to collect resource logs
+2. Create a Datadog Azure function with an Event Hub trigger to forward logs to Datadog whenever an event occurs
+3. Configure the Diagnostic Settings in Azure Resources and/or Azure Monitor to send both resource logs and activity logs to the Event Hub Topic
+
+This repository provides the Terraform code to create and configure the above resources with Vnet Integrtaion.
+
+## Getting Started
+
+### Prerequisites
+
+- Hashicorp Terraform - [Download](https://developer.hashicorp.com/terraform/install)
+- Azure CLI - [Download](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli-windows)
+- Azure Subscription - [Free Account](https://azure.microsoft.com/en-gb/pricing/purchase-options/azure-account/search?icid=free-search)
+
+### Setup
+
+- TODO: Add setup instructions
