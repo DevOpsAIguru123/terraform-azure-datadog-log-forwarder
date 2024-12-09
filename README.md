@@ -35,6 +35,7 @@ This repository provides Terraform code to automate the creation and configurati
 - Hashicorp Terraform - [Download](https://developer.hashicorp.com/terraform/install)
 - Azure CLI - [Download](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli-windows)
 - Ensure you have access to an active Azure subscription. If you don’t have one, you can sign up for a [free Azure account](https://azure.microsoft.com/en-gb/pricing/purchase-options/azure-account/search?icid=free-search)
+- Retrieve your Datadog API key from the Datadog dashboard under API Keys.
 
 ### Setup
 
@@ -56,16 +57,7 @@ az login
 az account set --subscription "<Your Subscription ID>"  
 ```
 
-#### 3. Customize Variables
-
-Update the terraform.tfvars file or your preferred variable configuration to specify:
-
-- Azure Resource Group
-- Region
-- Datadog site details (e.g., Datadog API Key, Datadog Site)
-- Event Hub and Diagnostic Settings configurations
-
-#### 4. Initialize Terraform
+#### 3. Initialize Terraform
 
 Initialize the Terraform project to download providers and prepare the workspace:
 
@@ -73,16 +65,22 @@ Initialize the Terraform project to download providers and prepare the workspace
 terraform init  
 ```
 
-#### 5. Plan and Apply
+#### 4. Plan and Apply
 
 Review the resources to be created and deploy them:
 
 ```
-terraform plan  
-terraform apply  
+terraform plan -var="location=<Azure Region>" \
+               -var="resource_group_name=<Resource Group Name>" \
+               -var="datadog_api_key=<Your Datadog API Key>"  
+terraform apply -var="location=<Azure Region>" \
+                -var="resource_group_name=<Resource Group Name>" \
+                -var="datadog_api_key=<Your Datadog API Key>"  
 ```
 
-#### 6. Verify the Setup
+Replace the placeholders (`<Azure Region>`, `<Resource Group Name>`, `<Your Datadog API Key>`) with your specific values.
+
+#### 5. Verify the Setup
 
 Once the deployment is complete:
 
