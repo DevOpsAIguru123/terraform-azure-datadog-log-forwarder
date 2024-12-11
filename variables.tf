@@ -1,6 +1,5 @@
-variable "resource_group_name" {
-  description = "The name of the resource group in which to create the resources."
-  default = "datadog-log-forwarder-rg"
+variable "subscription_id" {
+  description = "The Azure subscription ID."
   type = string
 }
 
