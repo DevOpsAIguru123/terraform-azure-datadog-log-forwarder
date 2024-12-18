@@ -2,6 +2,8 @@
 
 Terraform code to setup Azure resources required to collect and forward Azure resource logs to Datadog instance.
 
+This repository builds on top of the logic from Datadog Repository - https://github.com/DataDog/datadog-serverless-functions/tree/master and the business logic for the Azure Function is taken from here.
+
 ## Reference Architecture :bulb:
 
 Most Datadog sites (excluding US3) require a dedicated [Azure integration setup](https://docs.datadoghq.com/logs/guide/azure-logging-guide/?tab=automatedinstallation) to collect and forward Azure resource logs to Datadog. Below is an illustration of this setup:
