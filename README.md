@@ -2,7 +2,7 @@
 
 Terraform code to setup Azure resources required to collect and forward Azure resource logs to Datadog instance.
 
-This repository builds on top of the logic from Datadog Repository - https://github.com/DataDog/datadog-serverless-functions/tree/master and the business logic for the Azure Function is taken from here.
+**This repository builds on top of the logic from Datadog Repository - https://github.com/DataDog/datadog-serverless-functions/tree/master/azure and the business logic for the Azure Function is taken from [here](https://github.com/DataDog/datadog-serverless-functions/blob/master/azure/activity_logs_monitoring/index.js).**
 
 ## Reference Architecture :bulb:
 
