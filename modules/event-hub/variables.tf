@@ -17,3 +17,13 @@ variable "event_hub_name" {
   description = "The name of the Event Hub."
   type = string  
 }
+
+variable "vnet_id" {
+  description = "The ID of the virtual network."
+  type = string  
+}
+
+variable "subnet_id" {
+  description = "The ID of the subnet for private endpoints."
+  type = string  
+}

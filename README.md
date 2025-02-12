@@ -93,5 +93,4 @@ Once the deployment is complete:
 
 The following tasks will be added to the code base soon:
 
-1. Vnet Integration for Resources
-2. Example Azure resource with Diagnostic Setting configuration to direct logs to Event Hub
+1. Example Azure resource with Diagnostic Setting configuration to direct logs to Event Hub

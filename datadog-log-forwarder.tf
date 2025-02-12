@@ -13,6 +13,12 @@ module "prerequisites" {
     resource_group_name = format("rg-dd-log-forwarder-%s", random_string.id.result)
     location = var.location
     storage_account_name = format("stddlogforwarder%s", random_string.id.result)
+    vnet_name = format("vnet-dd-log-forwarder-%s", random_string.id.result)
+    vnet_address_space = ["10.0.0.0/23"]
+    snet_001_name = format("snet-001-dd-log-forwarder-%s", random_string.id.result)
+    snet_001_prefixes = ["10.0.0.0/27"]
+    snet_002_name = format("snet-002-dd-log-forwarder-%s", random_string.id.result)
+    snet_002_prefixes = ["10.0.0.32/27"]
 }
 
 ########################
@@ -26,6 +32,8 @@ module "eventhub" {
     location = var.location
     event_hub_namespace_name = format("ehns-dd-log-forwarder-%s", random_string.id.result)
     event_hub_name = format("eh-dd-log-forwarder-%s", random_string.id.result)
+    vnet_id = module.prerequisites.vnet_id
+    subnet_id = module.prerequisites.snet_001_id
 }
 
 # Azure functions to forward logs to Datadog
@@ -42,6 +50,9 @@ module "function" {
     datadog_site = "datadoghq.com"
     storage_account_name = module.prerequisites.storage_account_name
     storage_account_id = module.prerequisites.storage_account_id
+    vnet_id = module.prerequisites.vnet_id
+    fa_outbound_subnet_id = module.prerequisites.snet_002_id
+    fa_pep_subnet_id = module.prerequisites.snet_001_id
 }
 
 #########################################

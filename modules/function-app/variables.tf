@@ -53,3 +53,18 @@ variable "storage_account_id" {
     description = "The ID of the storage account."
     type = string   
 }
+
+variable "vnet_id" {
+    description = "The ID of the virtual network."
+    type = string  
+}
+
+variable "fa_outbound_subnet_id" {
+    description = "The ID of the subnet for vnet integration of the Function App."
+    type = string  
+}
+
+variable "fa_pep_subnet_id" {
+    description = "The ID of the subnet for private endpoint of the Function App."
+    type = string  
+}

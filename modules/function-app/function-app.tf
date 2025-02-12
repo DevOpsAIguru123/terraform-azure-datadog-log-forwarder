@@ -33,7 +33,49 @@ resource "azurerm_windows_function_app" "function_app" {
   identity {
     type = "SystemAssigned"
   }
+  public_network_access_enabled = false
+  virtual_network_subnet_id     = var.fa_outbound_subnet_id
 }
+
+#########################
+# Network Configuration #
+#########################
+
+# Private dns zone for function app default dns zone
+resource "azurerm_private_dns_zone" "private_dns_zone" {
+  name                = "privatelink.azurewebsites.net"
+  resource_group_name = var.resource_group_name
+}
+
+resource "azurerm_private_dns_zone_virtual_network_link" "private_dns_link" {
+  name                  = format("dnslink-fa-001")
+  resource_group_name   = var.resource_group_name
+  private_dns_zone_name = azurerm_private_dns_zone.private_dns_zone.name
+  virtual_network_id    = var.vnet_id
+  registration_enabled  = false
+}
+
+# Private endpoint for Function app
+resource "azurerm_private_endpoint" "pep-functionapp" {
+  name                = format("pep-fa-001")
+  resource_group_name = var.resource_group_name
+  location            = var.location
+  subnet_id           = var.fa_pep_subnet_id
+  private_service_connection {
+    name                           = format("psc-pep-fa-001")
+    private_connection_resource_id = azurerm_windows_function_app.function_app.id
+    is_manual_connection           = false
+    subresource_names              = ["sites"]
+  }
+  private_dns_zone_group {
+    name                 = format("pdnszg-pep-fa-001")
+    private_dns_zone_ids = [azurerm_private_dns_zone.private_dns_zone.id]
+  }
+}
+
+#######################
+# Role Assignments    #
+#######################
 
 # Role Assignment for storage account - https://learn.microsoft.com/en-us/azure/azure-functions/functions-reference?tabs=eventhubs&pivots=programming-language-javascript#connecting-to-host-storage-with-an-identity
 resource "azurerm_role_assignment" "role_assignment_storage" {
@@ -79,7 +121,9 @@ data "archive_file" "functions_zip" {
 
 # Publish code to function app
 locals {
+  allow_public_access_command = "az functionapp update --resource-group ${var.resource_group_name} -n ${azurerm_windows_function_app.function_app.name} --set publicNetworkAccess=Enabled siteConfig.publicNetworkAccess=Enabled"
   publish_code_command        = "az webapp deploy --resource-group ${var.resource_group_name} --name ${azurerm_windows_function_app.function_app.name} --src-path ${data.archive_file.functions_zip.output_path}"
+  deny_public_access_command  = "az functionapp update --resource-group ${var.resource_group_name} -n ${azurerm_windows_function_app.function_app.name} --set publicNetworkAccess=Disabled siteConfig.publicNetworkAccess=Disabled"
 }
 
 resource "null_resource" "function_app_publish" {
@@ -87,8 +131,16 @@ resource "null_resource" "function_app_publish" {
   triggers = {
     input_json                  = filemd5(data.archive_file.functions_zip.output_path)
     publish_code_command        = local.publish_code_command
+    allow_public_access_command = local.allow_public_access_command
+    deny_public_access_command  = local.deny_public_access_command
+  }
+  provisioner "local-exec" {
+    command = local.allow_public_access_command
   }
   provisioner "local-exec" {
     command = local.publish_code_command
+  }
+  provisioner "local-exec" {
+    command = local.deny_public_access_command
   }
 }
