@@ -13,6 +13,10 @@ resource "azurerm_eventhub_namespace" "eventhub-namespace" {
     virtual_network_rule           = []
     ip_rule                        = []
   }]
+   timeouts {
+    create = "60m"
+    read = "10m"
+  }
 }
 
 # Event hub topic
@@ -22,8 +26,17 @@ resource "azurerm_eventhub" "eventhub" {
   resource_group_name = var.resource_group_name
   partition_count     = 2
   message_retention   = 7
+  
+  depends_on = [azurerm_eventhub_namespace.eventhub-namespace]
+  
+  timeouts {
+    create = "30m"
+    read = "10m"
+  }
 }
 
+
+##### private endpoint #####
 # Create private dns zone for eventhub default dns zone
 resource "azurerm_private_dns_zone" "private_dns_zone" {
   name                = "privatelink.servicebus.windows.net"
@@ -53,5 +66,23 @@ resource "azurerm_private_endpoint" "pep-eventhub" {
   private_dns_zone_group {
     name                 = format("pdnszg-pep-eh-001")
     private_dns_zone_ids = [azurerm_private_dns_zone.private_dns_zone.id]
+  }
+}
+
+# Add authorization rule for monitoring
+resource "azurerm_eventhub_namespace_authorization_rule" "diagnostics_rule" {
+  name                = "DiagnosticsRule"
+  namespace_name      = azurerm_eventhub_namespace.eventhub-namespace.name
+  resource_group_name = var.resource_group_name
+  
+  listen = true
+  send   = true
+  manage = false
+  
+  depends_on = [azurerm_eventhub_namespace.eventhub-namespace]
+  
+  timeouts {
+    create = "30m"
+    read = "10m"
   }
 }

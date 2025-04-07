@@ -1,0 +1,20 @@
+#! /bin/bash
+# Script to fix Terraform state issues and resource conflicts
+
+echo "Fixing Terraform state for Log Analytics workspace..."
+echo ""
+echo "First, run the following to import the existing Log Analytics workspace:"
+echo "terraform import module.function.azurerm_log_analytics_workspace.log_analytics /subscriptions/60992dbe-c574-4373-948b-bb02216c5b0a/resourceGroups/rg-dd-log-forwarder-jzbku/providers/Microsoft.OperationalInsights/workspaces/law-fa-dd-log-forwarder-jzbku"
+echo ""
+echo "If Azure resources remain in a stuck state, you can remove them from Azure CLI:"
+echo "az group delete -n rg-dd-log-forwarder-jzbku --no-wait --yes"
+echo ""
+echo "After the cleanup is complete, run terraform apply with parallelism=1 to slow down creation:"
+echo "terraform apply -parallelism=1"
+echo ""
+echo "If problems persist, consider running individual modules one at a time:"
+echo "terraform apply -target=module.prerequisites -parallelism=1"
+echo "terraform apply -target=module.eventhub -parallelism=1"
+echo "terraform apply -target=module.function -parallelism=1"
+echo ""
+echo "These actions will help ensure resources are created sequentially and avoid race conditions." 

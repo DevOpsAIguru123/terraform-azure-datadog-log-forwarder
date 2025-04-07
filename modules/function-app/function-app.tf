@@ -9,6 +9,11 @@ resource "azurerm_service_plan" "app_service_plan" {
   location            = var.location
   os_type             = "Windows"
   sku_name            = "EP1"
+  
+  timeouts {
+    create = "60m"
+    read = "10m"
+  }
 }
 
 # Function app
@@ -25,7 +30,11 @@ resource "azurerm_windows_function_app" "function_app" {
     "EventHubConnection__credential"              = "managedidentity",
     "EventHubConnection__fullyQualifiedNamespace" = format("%s.servicebus.windows.net", var.event_hub_namespace_name),
     "DD_API_KEY"                                  = var.datadog_api_key,
-    "DD_SITE"                                     = var.datadog_site
+    "DD_SITE"                                     = var.datadog_site,
+    # Application Insights settings
+    "APPLICATIONINSIGHTS_CONNECTION_STRING"       = azurerm_application_insights.app_insights.connection_string,
+    "APPINSIGHTS_INSTRUMENTATIONKEY"              = azurerm_application_insights.app_insights.instrumentation_key,
+    "ApplicationInsightsAgent_EXTENSION_VERSION"  = "~3"
   }
   site_config {}
   storage_account_name          = var.storage_account_name
@@ -35,6 +44,13 @@ resource "azurerm_windows_function_app" "function_app" {
   }
   public_network_access_enabled = false
   virtual_network_subnet_id     = var.fa_outbound_subnet_id
+  
+  depends_on = [azurerm_service_plan.app_service_plan, azurerm_application_insights.app_insights]
+  
+  timeouts {
+    create = "60m"
+    read = "10m"
+  }
 }
 
 #########################
@@ -99,6 +115,7 @@ locals {
   function_json = templatefile("${path.module}/functions/dd-log-forwarder/function.json", { event_hub_name = var.event_hub_name })
   index_js      = file("${path.module}/functions/dd-log-forwarder/index.js")
   host_json     = file("${path.module}/functions/host.json")
+  source_hash   = sha256(join("", [local.function_json, local.index_js, local.host_json]))
 }
 
 # Create zip folder with functions
@@ -127,9 +144,9 @@ locals {
 }
 
 resource "null_resource" "function_app_publish" {
-  depends_on = [local.publish_code_command, azurerm_role_assignment.role_assignment_storage, azurerm_role_assignment.role_assignment_event_hub]
+  depends_on = [azurerm_role_assignment.role_assignment_storage, azurerm_role_assignment.role_assignment_event_hub, data.archive_file.functions_zip, azurerm_windows_function_app.function_app, azurerm_private_endpoint.pep-functionapp]
   triggers = {
-    input_json                  = filemd5(data.archive_file.functions_zip.output_path)
+    source_content_hash          = local.source_hash
     publish_code_command        = local.publish_code_command
     allow_public_access_command = local.allow_public_access_command
     deny_public_access_command  = local.deny_public_access_command

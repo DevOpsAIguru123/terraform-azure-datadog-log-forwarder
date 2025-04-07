@@ -58,3 +58,58 @@ module "function" {
 #########################################
 # TODO: Example Usage with Diagnostic Settings
 #########################################
+
+# Diagnostic settings for Storage Account
+resource "azurerm_monitor_diagnostic_setting" "storage_diagnostics" {
+  name                           = "diag-storage-logs"
+  target_resource_id             = module.prerequisites.storage_account_id
+  eventhub_name                  = module.eventhub.event_hub_name
+  eventhub_authorization_rule_id = "${module.eventhub.event_hub_namespace_id}/authorizationRules/RootManageSharedAccessKey"
+
+  metric {
+    category = "Transaction"
+    enabled  = true
+  }
+}
+
+# Diagnostic settings for Blob Storage
+resource "azurerm_monitor_diagnostic_setting" "blob_diagnostics" {
+  name                           = "diag-blob-logs"
+  target_resource_id             = "${module.prerequisites.storage_account_id}/blobServices/default"
+  eventhub_name                  = module.eventhub.event_hub_name
+  eventhub_authorization_rule_id = "${module.eventhub.event_hub_namespace_id}/authorizationRules/RootManageSharedAccessKey"
+
+  enabled_log {
+    category_group = "audit"
+  }
+
+  enabled_log {
+    category_group = "allLogs"
+  }
+
+  metric {
+    category = "Transaction"
+    enabled  = true
+  }
+}
+
+# Diagnostic settings for File Storage
+resource "azurerm_monitor_diagnostic_setting" "file_diagnostics" {
+  name                           = "diag-file-logs"
+  target_resource_id             = "${module.prerequisites.storage_account_id}/fileServices/default"
+  eventhub_name                  = module.eventhub.event_hub_name
+  eventhub_authorization_rule_id = "${module.eventhub.event_hub_namespace_id}/authorizationRules/RootManageSharedAccessKey"
+
+  enabled_log {
+    category_group = "audit"
+  }
+
+  enabled_log {
+    category_group = "allLogs"
+  }
+
+  metric {
+    category = "Transaction"
+    enabled  = true
+  }
+}
