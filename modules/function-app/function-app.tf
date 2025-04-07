@@ -2,6 +2,12 @@
 # Create Function App #
 #######################
 
+# Get storage account key
+data "azurerm_storage_account" "storage_account" {
+  name                = var.storage_account_name
+  resource_group_name = var.resource_group_name
+}
+
 # App service plan
 resource "azurerm_service_plan" "app_service_plan" {
   name                = var.app_service_plan_name
@@ -34,7 +40,10 @@ resource "azurerm_windows_function_app" "function_app" {
     # Application Insights settings
     "APPLICATIONINSIGHTS_CONNECTION_STRING"       = azurerm_application_insights.app_insights.connection_string,
     "APPINSIGHTS_INSTRUMENTATIONKEY"              = azurerm_application_insights.app_insights.instrumentation_key,
-    "ApplicationInsightsAgent_EXTENSION_VERSION"  = "~3"
+    "ApplicationInsightsAgent_EXTENSION_VERSION"  = "~3",
+    # Content storage settings
+    "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING"    = format("DefaultEndpointsProtocol=https;AccountName=%s;AccountKey=${data.azurerm_storage_account.storage_account.primary_access_key};EndpointSuffix=core.windows.net", var.storage_account_name),
+    "WEBSITE_CONTENTSHARE"                        = lower(var.function_app_name)
   }
   site_config {}
   storage_account_name          = var.storage_account_name
@@ -144,7 +153,7 @@ locals {
 }
 
 resource "null_resource" "function_app_publish" {
-  depends_on = [azurerm_role_assignment.role_assignment_storage, azurerm_role_assignment.role_assignment_event_hub, data.archive_file.functions_zip, azurerm_windows_function_app.function_app, azurerm_private_endpoint.pep-functionapp]
+  depends_on = [azurerm_role_assignment.role_assignment_storage, azurerm_role_assignment.role_assignment_event_hub, data.archive_file.functions_zip, azurerm_windows_function_app.function_app, azurerm_private_endpoint.pep-functionapp, data.azurerm_storage_account.storage_account]
   triggers = {
     source_content_hash          = local.source_hash
     publish_code_command        = local.publish_code_command
