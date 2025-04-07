@@ -18,6 +18,11 @@ resource "azurerm_storage_account" "storage_account" {
   account_replication_type = "LRS"
   min_tls_version          = "TLS1_2"
   allow_nested_items_to_be_public = false
+  public_network_access_enabled   = false
+  network_rules {
+    default_action = "Deny"
+    bypass         = ["AzureServices"]
+  }
   
   identity {
     type = "SystemAssigned"
